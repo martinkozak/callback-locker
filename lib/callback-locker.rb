@@ -26,7 +26,7 @@ class CallbackLocker
     
     ##
     # Holds callback stack.
-    # @returns [Array]  array of callbacks
+    # @return [Array]  array of callbacks
     #
     
     attr_accessor :stack
@@ -89,6 +89,8 @@ class CallbackLocker
     # Synchronizes using the lock. Works by similiar 
     # way as standard +Mutex#synchronize+.
     #
+    # @yield if locker is unlocked the given callback
+    #
     
     def synchronize(&block)
         if self.locked? or @syncing
@@ -113,6 +115,7 @@ class CallbackLocker
     def eval!
         @syncing = true
         @stack.each { |b| b.call() }
+        @stack.clear()
         @syncing = false        
     end
 

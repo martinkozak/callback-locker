@@ -1,26 +1,37 @@
-Callback Adapter
-================
+Callback Locker
+===============
 
-**callback-adapter** adapts a callback backed interface to an standard 
-one, so allows safe thread-synchronized usage of evented or 
-multithreaded libraries like [EventMachine][8] in standard applications 
-without necessary paradigm shift. 
+"Locker" is lockable box for equipment -- at this case box for 
+collecting the callbacks (in ites locked state) and running them 
+after unlocking. So, in fact, it serves as some kind of callback 
+semaphore or mutex. 
 
 Some trivial example:
 
-    require "callback-adapter"
+    require "callback-locker"
+    locker = CallbackLocker::new
     
-    class Foo
-        def bar(arg, &callback)
-            callback.call(arg)
-        end
+    foo = nil
+    locker.synchronize do
+        foo = "bar"
     end
     
-    obj = CallbackAdapter::new(Foo::new)
-    obj.bar("Some argument!")   # will return the "Some argument!" string back again
-
-In case, more return values are given to callback, returns an array
-of them. Internally, it's thread synchronized, so safe.
+    # ^^^ locker is unlocked, so #synchronize will execute callback
+    #     immediately 
+    
+    foo = nil
+    locker.lock!
+    locker.synchronize do
+        foo = "1"
+    end
+    locker.synchronize do
+        foo << "2"
+    end
+    locker.unlock!
+    
+    # ^^^ locker is locked, so callbacks are stacked and executed
+    #     immediately after the #unlock! method is call, so foo
+    #     will contain "12"
 
 Contributing
 ------------

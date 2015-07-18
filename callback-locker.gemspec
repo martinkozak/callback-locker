@@ -22,10 +22,12 @@ Gem::Specification.new do |s|
     ".project",
     "CHANGES.txt",
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE.txt",
     "README.md",
     "Rakefile",
     "VERSION",
+    "callback-locker.gemspec",
     "lib/callback-locker.rb",
     "test"
   ]
